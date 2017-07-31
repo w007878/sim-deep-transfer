@@ -4,4 +4,6 @@ import cv2
 import os
 import load_data
 
-
+class model:
+    def __init__(self):
+        
