@@ -39,11 +39,3 @@ def load_USPS_data():
 #     load_MNIST_data_labeled()
 #     load_MNIST_data_unlabeled()
 #     load_USPS_data()
-
-
-
-
-
-
-
-
