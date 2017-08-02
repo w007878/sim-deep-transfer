@@ -4,19 +4,19 @@ import cv2
 import os
 import load_data
 
-def init_bais_variable(shape):
+def init_bias_variable(shape):
     initial = tf.constant(-0.1, shape=shape)
     return tf.Variable(initial)
 
 def init_weight_variable(shape):
     initial = tf.random_normal(shape=shape, stddev=0.1)
-    return tf.Varialbe(initial)
+    return tf.Variable(initial)
 
 def conv2d(x, W):
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
 def max_pool_2x2(x):
-    return tf.nn.max_pool(x, kisize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
+    return tf.nn.max_pool(x, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')
           
 class Main_model:
     def __init__(self, keep_rate=1.0):
@@ -24,30 +24,30 @@ class Main_model:
         self.input_image = tf.reshape(self.input_data, [-1, 28, 28, 1])
         
         self.W_conv1 = init_weight_variable([3, 3, 1, 32])
-        self.b_conv1 = init_bais_variable([32])
+        self.b_conv1 = init_bias_variable([32])
         self.h_conv1 = tf.nn.relu(conv2d(self.input_image, self.W_conv1) + self.b_conv1) 
-        self.h_pool1 = max_pool_2x2(h_conv1)
+        self.h_pool1 = max_pool_2x2(self.h_conv1)
         
         self.W_conv2 = init_weight_variable([3, 3, 32, 64])
-        self.b_conv2 = init_bais_variable([64])
+        self.b_conv2 = init_bias_variable([64])
         self.h_conv2 = tf.nn.relu(conv2d(self.h_pool1, self.W_conv2) + self.b_conv2) 
 
-        self.W_conv3 = init_weight_variable([3, 3, 32, 64])
-        self.b_conv3 = init_bais_variable([64])
+        self.W_conv3 = init_weight_variable([3, 3, 64, 64])
+        self.b_conv3 = init_bias_variable([64])
         self.h_conv3 = tf.nn.relu(conv2d(self.h_conv2, self.W_conv3) + self.b_conv3) 
-        self.h_pool3 = max_pool_2x2(h_conv3)
+        self.h_pool3 = max_pool_2x2(self.h_conv3)
         
-        self.W_conv4 = init_weight_variable([3, 3, 32, 64])
-        self.b_conv4 = init_bais_variable([64])
+        self.W_conv4 = init_weight_variable([3, 3, 64, 64])
+        self.b_conv4 = init_bias_variable([64])
         self.h_conv4 = tf.nn.relu(conv2d(self.h_pool3, self.W_conv4) + self.b_conv4) 
 
-        self.W_conv5 = init_weight_variable([3, 3, 32, 128])
-        self.b_conv5 = init_bais_variable([128])
+        self.W_conv5 = init_weight_variable([3, 3, 64, 128])
+        self.b_conv5 = init_bias_variable([128])
         self.h_conv5 = tf.nn.relu(conv2d(self.h_conv4, self.W_conv5) + self.b_conv5) 
         self.h_conv5_flat = tf.reshape(self.h_conv5, [-1, 7 * 7 * 128])
         
         self.W_fc6 = init_weight_variable([7 * 7 * 128, 512])
-        self.b_fc6 = init_bais_variable([512])
+        self.b_fc6 = init_bias_variable([512])
         self.h_fc6 = tf.nn.relu(tf.matmul(self.h_conv5_flat, self.W_fc6) + self.b_fc6)
         self.h_fc6_drop = tf.nn.dropout(self.h_fc6, keep_rate)
         
@@ -66,13 +66,18 @@ class Main_model:
     
     def classifier_loss(self, label, logit):
         return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=logit))
+    
+    def confusion_loss(self):
+        return self.classifier_loss(tf.constant(0,5, shape=[2]), self.h_fcD)
         
-    def soft_loss(self, label, temperature):
-        l = tf.Variable(float32, shape=[10, 10])
-        
-        
-    def main_loss(self, label, domain_label, alpha=0.01, beta=0.1, temperature=10.0):
-        cls_loss = self.classifier_loss(label, self.fc8)
-        confusion_loss = self.classifier_loss(tf.constant(0,5, shape=[2]), self.fcD)
-        soft_loss = 
-        return cls_loss + alpha * confusion_loss + beta * soft_loss
+    def domain_loss(self, label):
+        return self.classifier_loss(label=label, logit=self.h_fcD)
+    # def soft_loss(self, label, temperature):
+    #     l = tf.Variable(float32, shape=[10, 10])
+    #     
+    #     
+    # def main_loss(self, label, domain_label, alpha=0.01, beta=0.1, temperature=10.0):
+    #     cls_loss = self.classifier_loss(label, self.fc8)
+    #     confusion_loss = self.classifier_loss(tf.constant(0,5, shape=[2]), self.fcD)
+    #     soft_loss = 
+    #     return cls_loss + alpha * confusion_loss + beta * soft_loss
