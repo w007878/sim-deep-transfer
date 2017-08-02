@@ -4,8 +4,10 @@ import model
 import load_data
 import visual_data
 import random
+import os
 
-EPOCH_NUM = 5000
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+EPOCH_NUM = 500
 
 def next_batch(x, batch_size=100):
     i = 0
@@ -26,8 +28,8 @@ if __name__ == '__main__':
     label_ = tf.placeholder(tf.float32, shape=[None, 10])
 
     source_data, source_label = load_data.load_USPS_data()
-    target_data_ld, targat_label_ld = load_data.load_MNIST_data_labeled()
-    target_data_uld, _ = load_data.load_MNIST_data_unlabeled()
+    target_data_ld, target_label_ld = load_data.load_MNIST_data_labeled()
+    target_data_uld, target_label_uld = load_data.load_MNIST_data_unlabeled()
     
     # Train the domain classifier and the confusion loss
     # get data
@@ -57,7 +59,7 @@ if __name__ == '__main__':
     print("Training the domain classifier and the confusion loss")
     for epoch_index in range(EPOCH_NUM):
         batch_index = 0
-        for image, domain in next_batch(domain_data, domain_label, batch_size=100000):
+        for image, domain in next_batch(domain_data, domain_label, batch_size=200):
             print("epoch %d, batch %d" % (epoch_index, batch_index))
             batch_index = batch_index + 1
             
@@ -73,9 +75,25 @@ if __name__ == '__main__':
             sim_network.W_fcD.trainable = True
             sim_network.b_fcD.trainable = True
 
-        accuracy = domain_accuracy.eval(feed_dict={sim_network.image_input:image, domain_:domain})
+        accuracy = domain_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, domain_:domain})
         print("Training domain accuracy %g" % accuracy)
     
-    print(domain_label)
+    class_label = np.concatenate((source_label, target_label_ld))
+    class_data = np.concatenate((source_data, target_data_ld))
+    
+    print("Training the digit classifier")
+    for epoch_index in range(EPOCH_NUM):
+        batch_index = 0
+        for image, label in next_batch(class_data, class_label, batch_size=200):
+            print ("epoch %d, batch %d" % (epoch_index, batch_index))
+            batch_index = batch_index + 1
+            
+            sess.run(classifier_train_step, feed_dict={sim_network.input_data:image, label_:label})
+        accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, label_:labbel})
+        print("Training digit classifier accuracy %g" % accuracy)
+
+    test_accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:target_data_uld, label_:target_label_uld})
+    print("Testing accuracy %g" % accuracy)
+    # print(domain_label)
     # classifier_loss = sim_network.classifier_loss()
     # classifier_train_step = tf.train.AdamOptimizer(1e-4).minimize(sim_network.)
