@@ -7,7 +7,8 @@ import random
 import os
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-EPOCH_NUM = 500
+EPOCH_NUM1 = 20
+EPOCH_NUM2 = 50
 
 def next_batch(x, batch_size=100):
     i = 0
@@ -57,7 +58,7 @@ if __name__ == '__main__':
     sess.run(tf.global_variables_initializer())
     
     print("Training the domain classifier and the confusion loss")
-    for epoch_index in range(EPOCH_NUM):
+    for epoch_index in range(EPOCH_NUM1):
         batch_index = 0
         for image, domain in next_batch(domain_data, domain_label, batch_size=200):
             print("epoch %d, batch %d" % (epoch_index, batch_index))
@@ -82,7 +83,7 @@ if __name__ == '__main__':
     class_data = np.concatenate((source_data, target_data_ld))
     
     print("Training the digit classifier")
-    for epoch_index in range(EPOCH_NUM):
+    for epoch_index in range(EPOCH_NUM2):
         batch_index = 0
         for image, label in next_batch(class_data, class_label, batch_size=200):
             print ("epoch %d, batch %d" % (epoch_index, batch_index))
