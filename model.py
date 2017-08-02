@@ -64,14 +64,17 @@ class Main_model:
         self.b_fcD = init_bias_variable([2])
         self.h_fcD = tf.nn.sigmoid(tf.matmul(self.h_fc7, self.W_fcD) + self.b_fcD)
     
-    def classifier_loss(self, label, logit):
+    def loss(self, label, logit):
         return tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=logit))
     
+    def classifier_loss(self, label):
+        return self.loss(label=label, logit=self.h_fc8)
+        
     def confusion_loss(self):
-        return self.classifier_loss(tf.constant(0,5, shape=[2]), self.h_fcD)
+        return self.loss(tf.constant(0,5, shape=[None, 2]), self.h_fcD)
         
     def domain_loss(self, label):
-        return self.classifier_loss(label=label, logit=self.h_fcD)
+        return self.loss(label=label, logit=self.h_fcD)
     # def soft_loss(self, label, temperature):
     #     l = tf.Variable(float32, shape=[10, 10])
     #     
