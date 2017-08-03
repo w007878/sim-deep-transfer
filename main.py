@@ -90,7 +90,7 @@ if __name__ == '__main__':
             batch_index = batch_index + 1
             
             sess.run(classifier_train_step, feed_dict={sim_network.input_data:image, label_:label})
-        accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, label_:labbel})
+        accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, label_:label})
         print("Training digit classifier accuracy %g" % accuracy)
 
     test_accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:target_data_uld, label_:target_label_uld})
