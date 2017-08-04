@@ -59,6 +59,7 @@ if __name__ == '__main__':
     classifier_accuracy = tf.reduce_mean(tf.cast(classifier_correct_prediction, tf.float32))
     
     sess.run(tf.global_variables_initializer())
+    saver = tf.train.Saver()
     
     print("Training the digit classifier")
     for epoch_index in range(EPOCH_NUM2):
@@ -70,6 +71,7 @@ if __name__ == '__main__':
             sess.run(classifier_train_step, feed_dict={sim_network.input_data:image, label_:label})
             accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, label_:label})
             print("Training digit classifier accuracy %g" % accuracy)
+    saver.save(sess, 'trained_model')
     
     print("Training the domain classifier and the confusion loss")
     for epoch_index in range(EPOCH_NUM1):
@@ -92,6 +94,7 @@ if __name__ == '__main__':
 
             accuracy = domain_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, domain_:domain})
             print("Training domain accuracy %g" % accuracy)
+    saver.save(sess, 'trained_model')
 
     test_accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:target_data_ld, label_:target_label_ld})
     print("Testing accuracy %g" % accuracy)
