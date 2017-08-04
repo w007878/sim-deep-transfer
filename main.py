@@ -76,11 +76,11 @@ if __name__ == '__main__':
             sim_network.W_fcD.trainable = True
             sim_network.b_fcD.trainable = True
 
-        accuracy = domain_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, domain_:domain})
-        print("Training domain accuracy %g" % accuracy)
+            accuracy = domain_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, domain_:domain})
+            print("Training domain accuracy %g" % accuracy)
     
-    class_label = np.concatenate((source_label, target_label_ld))
-    class_data = np.concatenate((source_data, target_data_ld))
+    class_label = np.concatenate((source_label, target_label_uld))
+    class_data = np.concatenate((source_data, target_data_uld))
     
     print("Training the digit classifier")
     for epoch_index in range(EPOCH_NUM2):
@@ -90,10 +90,10 @@ if __name__ == '__main__':
             batch_index = batch_index + 1
             
             sess.run(classifier_train_step, feed_dict={sim_network.input_data:image, label_:label})
-        accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, label_:label})
-        print("Training digit classifier accuracy %g" % accuracy)
+            accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:image, label_:label})
+            print("Training digit classifier accuracy %g" % accuracy)
 
-    test_accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:target_data_uld, label_:target_label_uld})
+    test_accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:target_data_ld, label_:target_label_ld})
     print("Testing accuracy %g" % accuracy)
     # print(domain_label)
     # classifier_loss = sim_network.classifier_loss()
