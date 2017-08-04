@@ -94,7 +94,7 @@ if __name__ == '__main__':
             print("Training digit classifier accuracy %g" % accuracy)
 
     test_accuracy = classifier_accuracy.eval(session=sess, feed_dict={sim_network.input_data:target_data_ld, label_:target_label_ld})
-    print("Testing accuracy %g" % accuracy)
+    print("Testing accuracy %g" % test_accuracy)
     # print(domain_label)
     # classifier_loss = sim_network.classifier_loss()
     # classifier_train_step = tf.train.AdamOptimizer(1e-4).minimize(sim_network.)
