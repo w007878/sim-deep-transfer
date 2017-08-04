@@ -6,7 +6,7 @@ import visual_data
 import random
 import os
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 EPOCH_NUM1 = 20
 EPOCH_NUM2 = 50
 
